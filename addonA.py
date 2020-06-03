@@ -4,7 +4,7 @@ bl_info = {
 	"version": (1, 0),
 	"blender": (2, 82, 0),
 	"location": "View3D > Add > Mesh",
-	"description": "addonA",
+	"description": "addonA can also be imported as a separated addon",
 	"warning": "development",
 	"wiki_url": "",
 	"category": "Add Mesh"}
@@ -16,7 +16,7 @@ class OBJECT_PT_AddonA(bpy.types.Panel):
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'UI'
 	bl_options = {'DEFAULT_CLOSED'}
-	bl_category = "blender_addon_wrapper"
+	bl_category = "wrapper"
 
 	def draw(self, context):
 		scn = context.scene

@@ -7,7 +7,6 @@ Python files registered with this class will also be reloaded when pressing F8 i
 
 Handy for rapid development.
 
-Works Blender 2.73
+Works Blender 2.73 and 2.82
 
-TODO:
-- Fix for Blender 2.82
+This project contains no License: https://choosealicense.com/no-permission/

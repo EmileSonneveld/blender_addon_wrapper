@@ -16,7 +16,7 @@ class OBJECT_PT_AddonB(bpy.types.Panel):
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'UI'
 	bl_options = {'DEFAULT_CLOSED'}
-	bl_category = "blender_addon_wrapper"
+	bl_category = "wrapper"
 
 	def draw(self, context):
 		scn = context.scene

@@ -1,6 +1,6 @@
 bl_info = {
-	"name": "blender_addon_wrapper",
-	"description": "blender_addon_wrapper",
+	"name": "wrapper",
+	"description": "wrapper",
 	"author": "Emile Sonneveld",
 	"version": (1, 0),
 	"blender": (2, 82, 0),
@@ -8,7 +8,7 @@ bl_info = {
 	"warning": "development",
 	"wiki_url": "",
 	"tracker_url": "",
-	"category": "blender_addon_wrapper"}
+	"category": "wrapper"}
 
 import os
 import sys
@@ -26,6 +26,8 @@ def isBlenderExecutablePath(p: str):
 		print("File doesn't exist: " + p)
 		return False
 	p = p.replace("\\", "/")
+	if p.endswith("blender.exe"): # Blender 2.82
+		return True
 	lastSlashIndex = p.rfind("/")
 	lastBlenderIndex = p.rfind("Blender/blender") + len("Blender/blender")
 	return lastSlashIndex < lastBlenderIndex
@@ -33,9 +35,10 @@ def isBlenderExecutablePath(p: str):
 
 #print("sys.argv[0]: " + sys.argv[0])
 # print(isBlenderExecutablePath("C:/Program Files/Blender Foundation/Blender/blender-app.exe"))
-# print(isBlenderExecutablePath("blender-app.exe")) # when opening a .blend file from command line.
+# print(isBlenderExecutablePath("blender-app.exe")) #When double clicking a .blend, or when launching a .blend from commandline (without specifying executable)
 # print(isBlenderExecutablePath("")) # empty on commandline
-# print(isBlenderExecutablePath("C:\\Users\\User\\AppData\\Roaming\\Blender Foundation\\Blender\\2.73\\scripts\\addons\\TDS_RandomPluginNameHere\\headless_background_scripts\\undercut.py"))
+# print(isBlenderExecutablePath("C:\\Users\\Emile\\AppData\\Roaming\\Blender Foundation\\Blender\\2.73\\scripts\\addons\\TDS_RandomPluginNameHere\\headless_background_scripts\\undercut.py"))
+# C:\Program Files\Blender Foundation\Blender 2.82\blender.exe
 
 classes = []
 all_registers = []
@@ -89,7 +92,14 @@ else:
 def register():
 	# bpy.utils.register_module(currentFolderName, verbose=True) # removed in Blender 2.80
 	for cls in classes:
-		bpy.utils.register_class(cls)
+		try:
+			bpy.utils.register_class(cls)
+		except Exception as e:
+			# example: RuntimeError: Error: Registering operator class: 'OBJECT_OT_my_cool_operator', invalid bl_idname 'my_cool_operator', must contain 1 '.' character
+			import traceback
+			# this allows half of the plugin to keep on working
+			print("Dirty exception when calling the register function!")
+			traceback.print_tb(e.__traceback__)
 	for func in all_registers:
 		try:
 			func()
