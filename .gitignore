@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+*.bak
+*gitignored*
+
+*.blend1
+*.blend2
+*.blend3
+*.blend4
+*.blend5
