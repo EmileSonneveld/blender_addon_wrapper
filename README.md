@@ -1,5 +1,5 @@
 # blender_addon_wrapper
-Allows to put multiple python files and plusins in one folder. 
+Allows to put multiple python files and addons in one folder. 
 
 The __init__.py file will automatically load all sibling/child python files and call their register functions. It will also seek and register all classes that can be registered by Blender.
 
