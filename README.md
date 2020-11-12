@@ -10,3 +10,22 @@ Handy for rapid development.
 Works Blender 2.73 and 2.82
 
 This project contains no License: https://choosealicense.com/no-permission/
+
+## Install example
+Linux:
+```bash
+cd $HOME/.config/blender/2.73/scripts/addons
+git clone https://github.com/EmileSonneveld/blender_addon_wrapper.git
+```
+Windows:
+```cmd
+cd %appdata%\Blender Foundation\Blender\2.73\scripts\addons
+git clone https://github.com/EmileSonneveld/blender_addon_wrapper.git
+```
+
+- Open Blender
+- Pres Ctrl-Alt-U
+- Enable the addon
+![cover_photo](readme_files/settings.png)
+- The following 2 panels should become visible:
+![cover_photo](readme_files/panel.png)

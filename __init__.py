@@ -17,36 +17,76 @@ import importlib
 currentFolderName = __file__.replace("\\", "/").split("/")[-2]
 
 
-def isBlenderExecutablePath(p: str):
-	if not p:
-		return False
-	if p == "blender-app.exe" or p == "blender":
-		return True
-	if not os.path.exists(p):
-		print("File doesn't exist: " + p)
-		return False
-	p = p.replace("\\", "/")
-	if p.endswith("blender.exe"): # Blender 2.82
-		return True
-	lastSlashIndex = p.rfind("/")
-	lastBlenderIndex = p.rfind("Blender/blender") + len("Blender/blender")
-	return lastSlashIndex < lastBlenderIndex
+def runningInBlender():
+	# print("sys.executable", sys.executable)
+	# print("sys.argv", sys.argv)
 
+	# Ways this script can be running:
 
-#print("sys.argv[0]: " + sys.argv[0])
-# print(isBlenderExecutablePath("C:/Program Files/Blender Foundation/Blender/blender-app.exe"))
-# print(isBlenderExecutablePath("blender-app.exe")) #When double clicking a .blend, or when launching a .blend from commandline (without specifying executable)
-# print(isBlenderExecutablePath("")) # empty on commandline
-# print(isBlenderExecutablePath("C:\\Users\\Emile\\AppData\\Roaming\\Blender Foundation\\Blender\\2.73\\scripts\\addons\\TDS_RandomPluginNameHere\\headless_background_scripts\\undercut.py"))
-# C:\Program Files\Blender Foundation\Blender 2.82\blender.exe
+	# - Paste "C:/Program Files/Blender Foundation/Blender/blender-app.exe" in windows cmd
+	# sys.executable C:\Program Files\Blender Foundation\Blender\blender-app.exe
+	# sys.argv ['C:/Program Files/Blender Foundation/Blender/blender-app.exe']
+
+	# - launch from windows taskbar:
+	# sys.executable C:\Program Files\Blender Foundation\Blender\blender-app.exe
+	# sys.argv ['C:\\Program Files\\Blender Foundation\\Blender\\blender-app.exe']
+
+	# - When loaded from Blender commandline with --python
+	# sys.executable C:\Program Files\Blender Foundation\Blender\blender-app.exe
+	# sys.argv ['C:/Program Files/Blender Foundation/Blender/blender-app.exe', '--background', '--python', 'C:\\Users\\EmileSonneveld\\AppData\\Roaming\\Blender Foundation\\Blender\\2.73\\scripts\\addons\\TDS_Blender_general\\utils\\headless_boolean.py', '--', 'some-arguments-here']
+
+	# - When .blend file is directly opened from commandline
+	# sys.executable C:\Program Files\Blender Foundation\Blender\blender-app.exe
+	# sys.argv ['blender-app.exe', 'C:\\cranioauto\\CranioAuto_Python\\configured_empty_scene.blend']
+
+	# - When loaded as package. python -m CranioAuto_Blender_addon #cranio_tests
+	# sys.executable C:\Users\EmileSonneveld\AppData\Local\Programs\Python\Python36\python.exe
+	# sys.argv ['-m', '#cranio_tests']
+
+	# - When a sub file is imported by a wild python script. from CranioAuto_Python.CranioAuto_Blender_addon.utils.python_utils import *
+	# sys.executable  C:\Users\EmileSonneveld\AppData\Local\Programs\Python\Python36\python.exe
+	# sys.argv  ['Copy_dlls.py']
+
+	# Linux: type "blender" in the terminal:
+	# sys.executable /usr/local/lib/blender2.73/blender
+	# sys.argv ['blender']
+
+	# Linux: Pasting "/usr/bin/blender" in the terminal:
+	# sys.executable /usr/local/lib/blender2.73/blender
+	# sys.argv ['/usr/bin/blender']
+
+	ex = sys.executable.lower().replace("\\", "/")
+	if ex.endswith("/blender.exe") or ex.endswith("/blender-app.exe"):
+		return True
+	if ex.endswith("/python.exe"):
+		return False
+
+	if ex.endswith("/blender") or ex.endswith("/blender-app"): # Linux
+		return True
+	if ex.endswith("/python"): # Linux
+		return False
+
+	if not os.path.exists(sys.executable):
+		print("sys.executable does not exist: " + sys.executable)
+		return False
+
+	return False
+
 
 classes = []
 all_registers = []
 all_unregister = []
 
 # Only automaticaly import everything when in Blender
-if not isBlenderExecutablePath(sys.argv[0]):
+if not runningInBlender():
 	print("Package not running as Blender addon: " + currentFolderName)
+	if(sys.argv[0] == "-m"):
+		# running as module. Allow to run file in this module
+		if len(sys.argv) > 1:
+			module_name = currentFolderName + '.' + sys.argv[1]
+			sys.argv = sys.argv[1:]
+			print("New args: ", sys.argv)
+			importlib.import_module(module_name)
 else:
 	if 'bpy' in locals():
 		print('Reloading addon: ' + currentFolderName)
